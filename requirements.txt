@@ -1,0 +1,9 @@
+transformers
+tokenizers
+pytorch-lightning
+torch
+torchvision
+pandas
+argparse
+sklearn
+numpy
