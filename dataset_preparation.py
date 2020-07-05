@@ -7,6 +7,16 @@ import os
 import pandas as pd
 from torch.utils.data import Dataset
 # Implement CollateFN using fast tokenizers. This function basically takes care of proper tokenization and batches of sequences
+
+# emotion labels
+label2int = {
+    "sadness": 0,
+    "joy": 1,
+    "love": 2,
+    "anger": 3,
+    "fear": 4,
+    "surprise": 5
+            }
 class TokenizersCollateFn:
     def __init__(self, max_tokens=512):
 
@@ -20,7 +30,7 @@ class TokenizersCollateFn:
             ("<s>", t.token_to_id("<s>")),
         )
         t.enable_truncation(max_tokens)
-        t.enable_padding(max_length=max_tokens, pad_id=t.token_to_id("<pad>"))
+        t.enable_padding(length=max_tokens, pad_id=t.token_to_id("<pad>"))
         self.tokenizer = t
 
     def __call__(self, batch):
@@ -89,16 +99,6 @@ if __name__ == '__main__':
             train_path = "dataset/train.txt"
             test_path = "dataset/test.txt"
             val_path = "dataset/val.txt"
-
-            # emotion labels
-            label2int = {
-            "sadness": 0,
-            "joy": 1,
-            "love": 2,
-            "anger": 3,
-            "fear": 4,
-            "surprise": 5
-            }
 
             data = load_from_pickle(directory="merged_training.pkl")
             # using a sample
