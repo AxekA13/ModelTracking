@@ -7,3 +7,4 @@ pandas
 argparse
 sklearn
 numpy
+mlflow
