@@ -6,7 +6,7 @@ Tutorialv1:
   - path: data/train.csv
     md5: 61fdd54abdbf6a85b778e937122e1194
   - path: pytitanic/features.py
-    md5: 1ba0320b1388d0a9526a74ba9d312137
+    md5: b67cdf598ba347777cc45d995217761a
   outs:
   - path: features/test_features.csv
     md5: 0f98759172b6e5340c0b878e77822c2f
