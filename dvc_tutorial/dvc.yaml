@@ -1,0 +1,10 @@
+stages:
+  Tutorialv1:
+    cmd: python3 -m pytitanic.features -o features -r data/train.csv -s data/test.csv
+    deps:
+    - data/test.csv
+    - data/train.csv
+    - pytitanic/features.py
+    outs:
+    - features/test_features.csv
+    - features/train_features.csv
