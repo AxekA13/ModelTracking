@@ -2,7 +2,12 @@ import argparse
 import pathlib
 import pandas as pd
 
+def get_ps(pclass, sex):
+    """Calculate `PclassSex` feature."""
 
+    pclasssex = (pclass - 1)*2 + int(sex == "male")
+    return pclasssex
+    
 def categorize(odir, trname, tsname):
     """Impute missing values."""
 
@@ -25,7 +30,11 @@ def categorize(odir, trname, tsname):
     df.loc[train.index, cols].to_csv(odir.joinpath("train_features.csv"))
     df.loc[test.index, cols[1:]].to_csv(odir.joinpath("test_features.csv"))
 
+    df["PclassSex"] = df.apply(lambda x: get_ps(x.Pclass, x.Sex), axis=1)
 
+    # Saving features
+    cols = ["Survived", "Pclass", "Sex", "PclassSex", "Age", "SibSp", "Parch",
+            "Fare", "CabinId", "EmbarkedId"]
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--out-dir", dest="odir",
