@@ -3,6 +3,9 @@ import pathlib
 import json
 import numpy as np
 import pandas as pd
+import os
+os.system('pip3 install catboost')
+os.system('pip3 install sklearn')
 from catboost import CatBoostClassifier
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.metrics import roc_auc_score, accuracy_score
