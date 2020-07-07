@@ -1,0 +1,14 @@
+Tutorialv1:
+  cmd: python3 -m pytitanic.features -o features -r data/train.csv -s data/test.csv
+  deps:
+  - path: data/test.csv
+    md5: 029c9cd22461f6dbe8d9ab01def965c6
+  - path: data/train.csv
+    md5: 61fdd54abdbf6a85b778e937122e1194
+  - path: pytitanic/features.py
+    md5: 1ba0320b1388d0a9526a74ba9d312137
+  outs:
+  - path: features/test_features.csv
+    md5: 0f98759172b6e5340c0b878e77822c2f
+  - path: features/train_features.csv
+    md5: ef94510a6595b8e4bd118cebf631f490
