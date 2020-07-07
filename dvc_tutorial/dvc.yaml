@@ -8,3 +8,14 @@ stages:
     outs:
     - features/test_features.csv
     - features/train_features.csv
+  model:
+    cmd: python3 -m pytitanic.model -o results -r features/train_features.csv -s features/test_features.csv
+    deps:
+    - features/test_features.csv
+    - features/train_features.csv
+    - pytitanic/model.py
+    outs:
+    - results/cb-model.cbm
+    - results/cb-submission.csv
+    metrics:
+    - results/cb-metrics.json

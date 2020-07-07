@@ -12,3 +12,19 @@ Tutorialv1:
     md5: 0f98759172b6e5340c0b878e77822c2f
   - path: features/train_features.csv
     md5: ef94510a6595b8e4bd118cebf631f490
+model:
+  cmd: python3 -m pytitanic.model -o results -r features/train_features.csv -s features/test_features.csv
+  deps:
+  - path: features/test_features.csv
+    md5: 0f98759172b6e5340c0b878e77822c2f
+  - path: features/train_features.csv
+    md5: ef94510a6595b8e4bd118cebf631f490
+  - path: pytitanic/model.py
+    md5: d7d512f650ca81c471e68da073e9005d
+  outs:
+  - path: results/cb-metrics.json
+    md5: ba412c91f01c8f1c6f3a765b87dd5d85
+  - path: results/cb-model.cbm
+    md5: cfa6a20972e6706a675445822e959212
+  - path: results/cb-submission.csv
+    md5: d8b503d567d9426ef744b38f378887a2
