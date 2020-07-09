@@ -2,6 +2,7 @@ import pytorch_lightning as pl
 from torch import nn
 import torch
 import gc
+import mlflow
 from model import EmoModel
 from torch.utils.data import DataLoader
 from transformers import get_linear_schedule_with_warmup,AutoModelWithLMHead,AdamW
@@ -9,9 +10,11 @@ from dataset_preparation import EmoDataset,TokenizersCollateFn
 from torch_lr_finder import LRFinder
 from argparse import Namespace
 from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score  
 from typing import List
 from functools import lru_cache
 from dataset_preparation import label2int
+
 ## Methods required by PyTorchLightning
 """
     __init__ - to initialize custom variables in your model
@@ -38,6 +41,7 @@ class TrainingModule(pl.LightningModule):
         loss_key = f"{step_name}_loss"
         tensorboard_logs = {loss_key: loss}
 
+        mlflow.log_metric(("train_loss" if step_name == "train" else loss_key),loss)
         return { ("loss" if step_name == "train" else loss_key): loss, 'log': tensorboard_logs,
                "progress_bar": {loss_key: loss}}
 
@@ -52,6 +56,7 @@ class TrainingModule(pl.LightningModule):
 
     def validation_end(self, outputs: List[dict]):
         loss = torch.stack([x["val_loss"] for x in outputs]).mean()
+
         return {"val_loss": loss}
         
     def test_step(self, batch, batch_idx):
@@ -128,24 +133,34 @@ if __name__ == '__main__':
     gc.collect()
     torch.cuda.empty_cache()
 
-    ## train roughly for about 10-15 minutes with GPU enabled.
-    trainer = pl.Trainer(gpus=1, max_epochs=hparams.epochs, progress_bar_refresh_rate=10,
-                     accumulate_grad_batches=hparams.accumulate_grad_batches)
 
-    trainer.fit(module)
+    mlflow.create_experiment('mlflow with ssh')
+
+        with mlflow.start_run():
+    ## train roughly for about 10-15 minutes with GPU enabled.
+            trainer = pl.Trainer(gpus=1, max_epochs=hparams.epochs, progress_bar_refresh_rate=10,
+                            accumulate_grad_batches=hparams.accumulate_grad_batches)
+
+            trainer.fit(module)
+            mlflow.log_params({'batch_size':hparams.batch_size,'warmup_steps':hparams.warmup_steps,'epochs':epochs,'learning_rate':lr,'accumulate_grad_batches':hparams.accumulate_grad_batches})
 
     # evaluating the trained model
 
-    with torch.no_grad():
-        progress = ["/", "-", "\\", "|", "/", "-", "\\", "|"]
-        module.eval()
-        true_y, pred_y = [], []
-        for i, batch_ in enumerate(module.test_dataloader()):
-            (X, attn), y = batch_
-            batch = (X.cuda(), attn.cuda())
-            print(progress[i % len(progress)], end="\r")
-            y_pred = torch.argmax(module(batch), dim=1)
-            true_y.extend(y.cpu())
-            pred_y.extend(y_pred.cpu())
-    print("\n" + "_" * 80)
-    print(classification_report(true_y, pred_y, target_names=label2int.keys(), digits=6))
+
+            with torch.no_grad():
+                progress = ["/", "-", "\\", "|", "/", "-", "\\", "|"]
+                module.eval()
+                true_y, pred_y = [], []
+                for i, batch_ in enumerate(module.test_dataloader()):
+                    (X, attn), y = batch_
+                    batch = (X.cuda(), attn.cuda())
+                    print(progress[i % len(progress)], end="\r")
+                    y_pred = torch.argmax(module(batch), dim=1)
+                    accuracy = accuracy_score(y,y_pred)
+                    mlflow.log_metric('test_accuracy',accuracy)
+                    true_y.extend(y.cpu())
+                    pred_y.extend(y_pred.cpu())
+            print("\n" + "_" * 80)
+            print(classification_report(true_y, pred_y, target_names=label2int.keys(), digits=6))
+            mlflow.pytorch.log_model(module.model,'models')
+            mlflow.pytorch.save_model(module.model,'./')
