@@ -1,8 +1,0 @@
-name: tutorials
-
-entry_points:
-  main:
-    parameters:
-      alpha: {type: float, default: 0.5}
-      l1_ratio: {type: float, default: 0.5}
-    command: "python3 mlflow_train.py {alpha} {l1_ratio}"
