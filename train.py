@@ -3,6 +3,7 @@ from torch import nn
 import torch
 import gc
 import mlflow
+import mlflow.pytorch
 from model import EmoModel
 from torch.utils.data import DataLoader
 from transformers import get_linear_schedule_with_warmup,AutoModelWithLMHead,AdamW
@@ -41,7 +42,7 @@ class TrainingModule(pl.LightningModule):
         loss_key = f"{step_name}_loss"
         tensorboard_logs = {loss_key: loss}
 
-        mlflow.log_metric(("train_loss" if step_name == "train" else loss_key),loss)
+        mlflow.log_metric(("train_loss" if step_name == "train" else loss_key),loss.item())
         return { ("loss" if step_name == "train" else loss_key): loss, 'log': tensorboard_logs,
                "progress_bar": {loss_key: loss}}
 
@@ -134,15 +135,15 @@ if __name__ == '__main__':
     torch.cuda.empty_cache()
 
 
-    mlflow.create_experiment('mlflow with ssh')
+    mlflow.set_experiment('mlflow with ssh')
 
-        with mlflow.start_run():
+    with mlflow.start_run():
     ## train roughly for about 10-15 minutes with GPU enabled.
             trainer = pl.Trainer(gpus=1, max_epochs=hparams.epochs, progress_bar_refresh_rate=10,
                             accumulate_grad_batches=hparams.accumulate_grad_batches)
 
             trainer.fit(module)
-            mlflow.log_params({'batch_size':hparams.batch_size,'warmup_steps':hparams.warmup_steps,'epochs':epochs,'learning_rate':lr,'accumulate_grad_batches':hparams.accumulate_grad_batches})
+            mlflow.log_params({'batch_size':hparams.batch_size,'warmup_steps':hparams.warmup_steps,'epochs':hparams.epochs,'learning_rate':hparams.lr,'accumulate_grad_batches':hparams.accumulate_grad_batches})
 
     # evaluating the trained model
 
@@ -156,11 +157,11 @@ if __name__ == '__main__':
                     batch = (X.cuda(), attn.cuda())
                     print(progress[i % len(progress)], end="\r")
                     y_pred = torch.argmax(module(batch), dim=1)
-                    accuracy = accuracy_score(y,y_pred)
+                    accuracy = accuracy_score(y.cpu(),y_pred.cpu())
                     mlflow.log_metric('test_accuracy',accuracy)
                     true_y.extend(y.cpu())
                     pred_y.extend(y_pred.cpu())
             print("\n" + "_" * 80)
             print(classification_report(true_y, pred_y, target_names=label2int.keys(), digits=6))
             mlflow.pytorch.log_model(module.model,'models')
-            mlflow.pytorch.save_model(module.model,'./')
+            mlflow.pytorch.save_model(module.model,'models')
