@@ -13,8 +13,8 @@ def merge_mlurns(downloaded_mlruns_path='/home/axeka/Загрузки/mlruns',lo
 if __name__ == '__main__':
 
 # move mlurns to google colab
-source = '/content/NLP/mlruns'
-dest = '/colabdrive/mlruns/'
+    source = '/content/NLP/mlruns'
+    dest = '/colabdrive/mlruns/'
 
-shutil.copytree(source,dest)
+    shutil.copytree(source,dest)
 
