@@ -8,3 +8,5 @@ argparse
 sklearn
 numpy
 mlflow
+google-api-python-client
+PyDrive
