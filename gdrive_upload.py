@@ -50,12 +50,12 @@ results = service.files().list(
     pageSize=10, 
     fields="nextPageToken, files(id, name, mimeType, parents, createdTime)",
     q=query).execute()
-if results['files']:
+if not results['files']:
     media = MediaFileUpload(file_path, resumable=True)
     r = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
     print('Uploaded NLP.zip')
-#else:
-#print('File already exists','id:' + results['files'][0]['id'])
+else:
+    print('File already exists','id:' + results['files'][0]['id'])
 
 
 
