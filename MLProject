@@ -1,0 +1,6 @@
+name: Emotions
+
+entry_points:
+  main:
+    parameters:
+    command: "python3 train.py"
