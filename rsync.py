@@ -8,7 +8,7 @@ parser.add_argument('-p','--port',help='port for connection',default='9999')
 args = parser.parse_args()
 
 print(f'rsync -zavP "-e ssh -p {args.port}"{args.source_folder} {args.target_folder}')
-os.system(f'rsync -zavP "-e ssh -p {args.port}" {args.source_folder} {args.target_folder}')
+os.system(f'rsync -zaP "-e ssh -p {args.port}"root@127.0.0.1:{args.source_folder} {args.target_folder}')
 os.system('mlflow ui')
 
 
