@@ -137,8 +137,8 @@ if __name__ == '__main__':
     gc.collect()
     torch.cuda.empty_cache()
 
-
-    mlflow.set_experiment('mlflow with ssh')
+    mlflow.set_tracking_uri('file-plugin:/home/axeka/VSCodeProjects/NLP_Emotions/NLP_Emotions/mlruns')
+    #mlflow.set_experiment('mlflow with ssh')
 
     with mlflow.start_run():
     ## train roughly for about 10-15 minutes with GPU enabled.
