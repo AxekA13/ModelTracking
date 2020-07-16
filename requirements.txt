@@ -10,3 +10,5 @@ numpy
 mlflow
 google-api-python-client
 PyDrive
+dvc
+pickle
