@@ -4,6 +4,9 @@ import torch
 import gc
 import mlflow
 import mlflow.pytorch
+import pickle
+import os
+import git
 from model import EmoModel
 from torch.utils.data import DataLoader
 from transformers import get_linear_schedule_with_warmup,AutoModelWithLMHead,AdamW
@@ -163,5 +166,10 @@ if __name__ == '__main__':
                     pred_y.extend(y_pred.cpu())
             print("\n" + "_" * 80)
             print(classification_report(true_y, pred_y, target_names=label2int.keys(), digits=6))
-            mlflow.pytorch.log_model(module.model,'models')
-            mlflow.pytorch.save_model(module.model,'models')
+
+    # saving model for dvc
+    with open(MODEL_PATH,'wb') as model_file:
+        pickle.dump(module.model,model_file)
+        print('Model stored into' + MODEL_PATH)
+
+    
