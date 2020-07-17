@@ -6,7 +6,7 @@ import mlflow
 import mlflow.pytorch
 import pickle
 import os
-import git
+from git_url import get_commit_url
 from model import EmoModel
 from torch.utils.data import DataLoader
 from transformers import get_linear_schedule_with_warmup,AutoModelWithLMHead,AdamW
@@ -131,13 +131,15 @@ if __name__ == '__main__':
     lr=1e-4,
     accumulate_grad_batches=1)
 
+    MODEL_PATH = '/content/NLP_Emotions/model/model.pkl'
+
     module = TrainingModule(hparams)
 
     ## garbage collection
     gc.collect()
     torch.cuda.empty_cache()
 
-    mlflow.set_tracking_uri('file-plugin:/home/axeka/VSCodeProjects/NLP_Emotions/NLP_Emotions/mlruns')
+    mlflow.set_tracking_uri('file-plugin:/content/NLP_Emotions/mlruns')
     #mlflow.set_experiment('mlflow with ssh')
 
     with mlflow.start_run():
@@ -166,7 +168,7 @@ if __name__ == '__main__':
                     pred_y.extend(y_pred.cpu())
             print("\n" + "_" * 80)
             print(classification_report(true_y, pred_y, target_names=label2int.keys(), digits=6))
-
+            mlflow.set_tag('Commit', get_commit_url())
     # saving model for dvc
     with open(MODEL_PATH,'wb') as model_file:
         pickle.dump(module.model,model_file)
