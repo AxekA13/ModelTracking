@@ -5,6 +5,7 @@ from mlflow.tracking.context.abstract_context import RunContextProvider
 from mlflow.tracking.context.default_context import _get_main_file
 from mlflow.utils.mlflow_tags import MLFLOW_GIT_COMMIT
 import mlflow
+import subprocess
 
 _logger = logging.getLogger(__name__)
 
@@ -43,7 +44,9 @@ class GitRunContext(RunContextProvider):
     def _source_version(self):
         if "source_version" not in self._cache:
             self._cache["source_version"] = _get_source_version()
-        return 'https://github.com/AxekA13/NLP_Emotions/tree/' + self._cache["source_version"]
+        remote_url = subprocess.check_output("git remote get-url origin",shell=True)
+
+        return str(remote_url).split('.git')[0][2:] + '/tree/' + self._cache["source_version"]
 
     def in_context(self):
         return self._source_version is not None
