@@ -173,6 +173,7 @@ if __name__ == '__main__':
                     pred_y.extend(y_pred)
             mlflow.log_metrics({'accuracy':acc(torch.tensor(pred_y),torch.tensor(true_y)).item(),'f1':f1(torch.tensor(pred_y),torch.tensor(true_y)).item(),'precision':precision(torch.tensor(pred_y),torch.tensor(true_y)).item(),'recall':recall(torch.tensor(pred_y),torch.tensor(true_y)).item()})
             mlflow.set_tag('Commit', get_commit_url())
+            mlflow.set_tag('Version','LRFinder')
     # saving model for dvc
     with open(MODEL_PATH,'wb') as model_file:
         pickle.dump(module.model,model_file)
