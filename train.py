@@ -18,6 +18,7 @@ from sklearn.metrics import accuracy_score
 from typing import List
 from functools import lru_cache
 from dataset_preparation import label2int
+from pytorch_lightning.metrics.classification import Accuracy,F1,Precision,Recall
 
 ## Methods required by PyTorchLightning
 """
@@ -74,6 +75,9 @@ class TrainingModule(pl.LightningModule):
 
     def test_dataloader(self):
         return self.create_data_loader(self.hparams.test_path)
+    
+    def configure_optimizers(self):
+        optimizer = torch.optim.SGD()
                 
     def create_data_loader(self, ds_path: str, shuffle=False):
         return DataLoader(
@@ -140,8 +144,11 @@ if __name__ == '__main__':
     torch.cuda.empty_cache()
 
     mlflow.set_tracking_uri('file-plugin:/content/NLP_Emotions/mlruns')
-    #mlflow.set_experiment('mlflow with ssh')
-
+    mlflow.set_experiment('LR Finder without augmentation')
+    acc = Accuracy()
+    f1 = F1()
+    precision = Precision()
+    recall = Recall()
     with mlflow.start_run():
     ## train roughly for about 10-15 minutes with GPU enabled.
             trainer = pl.Trainer(gpus=1, max_epochs=hparams.epochs, progress_bar_refresh_rate=10,
@@ -152,7 +159,7 @@ if __name__ == '__main__':
 
     # evaluating the trained model
 
-
+            
             with torch.no_grad():
                 progress = ["/", "-", "\\", "|", "/", "-", "\\", "|"]
                 module.eval()
@@ -162,12 +169,9 @@ if __name__ == '__main__':
                     batch = (X.cuda(), attn.cuda())
                     print(progress[i % len(progress)], end="\r")
                     y_pred = torch.argmax(module(batch), dim=1)
-                    accuracy = accuracy_score(y.cpu(),y_pred.cpu())
-                    mlflow.log_metric('test_accuracy',accuracy)
-                    true_y.extend(y.cpu())
-                    pred_y.extend(y_pred.cpu())
-            print("\n" + "_" * 80)
-            print(classification_report(true_y, pred_y, target_names=label2int.keys(), digits=6))
+                    true_y.extend(y)
+                    pred_y.extend(y_pred)
+            mlflow.log_metrics({'accuracy':acc(torch.tensor(pred_y),torch.tensor(true_y)).item(),'f1':f1(torch.tensor(pred_y),torch.tensor(true_y)).item(),'precision':precision(torch.tensor(pred_y),torch.tensor(true_y)).item(),'recall':recall(torch.tensor(pred_y),torch.tensor(true_y)).item()})
             mlflow.set_tag('Commit', get_commit_url())
     # saving model for dvc
     with open(MODEL_PATH,'wb') as model_file:
