@@ -6,6 +6,7 @@ import mlflow
 import mlflow.pytorch
 import pickle
 import os
+import yaml
 from git_url import get_commit_url
 from model import EmoModel
 from torch.utils.data import DataLoader
@@ -125,15 +126,19 @@ def learningrate_finder(uper_bound,lower_bound,dataset_directory,end_learning =1
     lr_finder.reset()
 
 if __name__ == '__main__':
+    
+    with open("params.yaml", 'r') as fd:
+        params = yaml.safe_load(fd)
+        
     hparams = Namespace(
-    train_path='dataset/train.txt',
-    val_path='dataset/val.txt',
-    test_path='dataset/test.txt',
-    batch_size=32,
-    warmup_steps=100,
-    epochs=1,
-    lr=1e-4,
-    accumulate_grad_batches=1)
+    train_path=params['lr_finder']['train_path'],
+    val_path=params['lr_finder']['val_path'],
+    test_path=params['lr_finder']['test_path'],
+    batch_size=params['lr_finder']['batch_size'],
+    warmup_steps=params['lr_finder']['warmup_steps'],
+    epochs=params['lr_finder']['epochs'],
+    lr=float(params['lr_finder']['lr']),
+    accumulate_grad_batches=params['lr_finder']['accumulate_grad_batches'])
 
     MODEL_PATH = '/content/NLP_Emotions/model/model.pkl'
 
