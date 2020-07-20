@@ -12,3 +12,4 @@ torch_lr_finder==0.2.0
 google-api-python-client
 PyDrive
 dvc
+textattack
