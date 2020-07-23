@@ -1,4 +1,4 @@
-lr_finder:
+train:
   train_path: 'dataset/train.txt'
   val_path: 'dataset/val.txt'
   test_path: 'dataset/test.txt'
@@ -8,10 +8,5 @@ lr_finder:
   lr: 1e-4
   accumulate_grad_batches: 1
 
-SGD:
-  train_path: 'dataset/train.txt'
-  val_path: 'dataset/val.txt'
-  test_path: 'dataset/test.txt'
-  batch_size: 32
-  epochs: 1
-  lr: 1e-4
+test:
+  model_path: '/content/NLP_Emotions/model/model.ckp'
