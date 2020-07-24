@@ -40,6 +40,7 @@ class TrainingModule(pl.LightningModule):
         self.model = EmoModel(AutoModelWithLMHead.from_pretrained("distilroberta-base").base_model,6)
         self.loss = nn.CrossEntropyLoss() ## combines LogSoftmax() and NLLLoss()
         self.hparams = hparams
+        self.sa
 
     def step(self, batch, step_name="train"):
         X, y = batch
@@ -131,16 +132,15 @@ if __name__ == '__main__':
         params = yaml.safe_load(fd)
         
     hparams = Namespace(
-    train_path=params['lr_finder']['train_path'],
-    val_path=params['lr_finder']['val_path'],
-    test_path=params['lr_finder']['test_path'],
-    batch_size=params['lr_finder']['batch_size'],
-    warmup_steps=params['lr_finder']['warmup_steps'],
-    epochs=params['lr_finder']['epochs'],
-    lr=float(params['lr_finder']['lr']),
-    accumulate_grad_batches=params['lr_finder']['accumulate_grad_batches'])
+    train_path=params['train']['train_path'],
+    val_path=params['train']['val_path'],
+    test_path=params['train']['test_path'],
+    batch_size=params['train']['batch_size'],
+    warmup_steps=params['train']['warmup_steps'],
+    epochs=params['train']['epochs'],
+    lr=float(params['train']['lr']),
+    accumulate_grad_batches=params['train']['accumulate_grad_batches'])
 
-    MODEL_PATH = '/content/NLP_Emotions/model/model.pkl'
 
     module = TrainingModule(hparams)
 
@@ -160,6 +160,7 @@ if __name__ == '__main__':
                             accumulate_grad_batches=hparams.accumulate_grad_batches)
 
             trainer.fit(module)
+            trainer.save_checkpoint('/content/NLP_Emotions/model/model.ckp')
             mlflow.log_params({'batch_size':hparams.batch_size,'warmup_steps':hparams.warmup_steps,'epochs':hparams.epochs,'learning_rate':hparams.lr,'accumulate_grad_batches':hparams.accumulate_grad_batches})
 
     # evaluating the trained model
@@ -179,9 +180,4 @@ if __name__ == '__main__':
             mlflow.log_metrics({'accuracy':acc(torch.tensor(pred_y),torch.tensor(true_y)).item(),'f1':f1(torch.tensor(pred_y),torch.tensor(true_y)).item(),'precision':precision(torch.tensor(pred_y),torch.tensor(true_y)).item(),'recall':recall(torch.tensor(pred_y),torch.tensor(true_y)).item()})
             mlflow.set_tag('Commit', get_commit_url())
             mlflow.set_tag('Version','LRFinder')
-    # saving model for dvc
-    with open(MODEL_PATH,'wb') as model_file:
-        pickle.dump(module.model,model_file)
-        print('Model stored into' + MODEL_PATH)
-
-    
+            mlflow.set_tag('Commit time',get_commit_time())
