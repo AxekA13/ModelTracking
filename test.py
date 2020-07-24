@@ -4,6 +4,7 @@ import torch
 import mlflow
 import subprocess
 from train import TrainingModule
+from git_url import get_commit_url,get_commit_time
 from pytorch_lightning.metrics.classification import Accuracy,F1,Precision,Recall
 
 def get_closest_gittag():
@@ -31,10 +32,14 @@ if __name__ == '__main__':
     if get_closest_gittag() == 'v1.0':
         mlflow.set_experiment('LR Finder')
         mlflow.set_tag('Stage','test')
+        mlflow.set_tag('Commit', get_commit_url())
+        mlflow.set_tag('Commit time',get_commit_time())
         mlflow.log_params({'batch_size':module.hparams.batch_size,'warmup_steps':module.hparams.warmup_steps,'epochs':module.hparams.epochs,'learning_rate':module.hparams.lr,'accumulate_grad_batches':module.hparams.accumulate_grad_batches})
     elif get_closest_gittag() == 'v2.0':
         mlflow.set_experiment('SGD')
         mlflow.set_tag('Stage','test')
+        mlflow.set_tag('Commit', get_commit_url())
+        mlflow.set_tag('Commit time',get_commit_time())
         mlflow.log_params({'batch_size':module.hparams.batch_size,'epochs':module.hparams.epochs,'learning_rate':module.hparams.lr})
     else:
         try:
@@ -44,6 +49,8 @@ if __name__ == '__main__':
         except AttributeError:
             mlflow.set_experiment('SGD')
             mlflow.set_tag('Stage','test by default')
+            mlflow.set_tag('Commit', get_commit_url())
+            mlflow.set_tag('Commit time',get_commit_time())
             mlflow.log_params({'batch_size':module.hparams.batch_size,'epochs':module.hparams.epochs,'learning_rate':module.hparams.lr})
             
 
