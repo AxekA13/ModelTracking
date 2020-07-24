@@ -37,9 +37,15 @@ if __name__ == '__main__':
         mlflow.set_tag('Stage','test')
         mlflow.log_params({'batch_size':module.hparams.batch_size,'epochs':module.hparams.epochs,'learning_rate':module.hparams.lr})
     else:
-        mlflow.set_experiment('LR Finder')
-        mlflow.set_tag('Stage','test by default')
-        mlflow.log_params({'batch_size':module.hparams.batch_size,'warmup_steps':module.hparams.warmup_steps,'epochs':module.hparams.epochs,'learning_rate':module.hparams.lr,'accumulate_grad_batches':module.hparams.accumulate_grad_batches})
+        try:
+            mlflow.set_experiment('LR Finder')
+            mlflow.set_tag('Stage','test by default')
+            mlflow.log_params({'batch_size':module.hparams.batch_size,'warmup_steps':module.hparams.warmup_steps,'epochs':module.hparams.epochs,'learning_rate':module.hparams.lr,'accumulate_grad_batches':module.hparams.accumulate_grad_batches})
+        except AttributeError:
+            mlflow.set_experiment('SGD')
+            mlflow.set_tag('Stage','test by default')
+            mlflow.log_params({'batch_size':module.hparams.batch_size,'epochs':module.hparams.epochs,'learning_rate':module.hparams.lr})
+            
 
         with torch.no_grad():
             true_y, pred_y = [],[]
