@@ -40,7 +40,7 @@ class TrainingModule(pl.LightningModule):
         self.model = EmoModel(AutoModelWithLMHead.from_pretrained("distilroberta-base").base_model,6)
         self.loss = nn.CrossEntropyLoss() ## combines LogSoftmax() and NLLLoss()
         self.hparams = hparams
-        self.sa
+        self.save_hyperparameters()
 
     def step(self, batch, step_name="train"):
         X, y = batch
