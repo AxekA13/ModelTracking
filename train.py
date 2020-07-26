@@ -149,7 +149,7 @@ if __name__ == '__main__':
     torch.cuda.empty_cache()
 
     mlflow.set_tracking_uri('file-plugin:/content/NLP_Emotions/mlruns')
-    mlflow.set_experiment('LR Finder without augmentation')
+    mlflow.set_experiment('LR Finder')
     acc = Accuracy()
     f1 = F1()
     precision = Precision()
