@@ -7,5 +7,5 @@ def get_commit_url():
 
 def get_commit_time():
     time = subprocess.check_output("git show -s --format=%ci HEAD",shell=True)
-    return time[2:-7]
+    return str(time)[2:21]
 print(get_commit_time())
