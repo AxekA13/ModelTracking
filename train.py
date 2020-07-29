@@ -37,9 +37,10 @@ from pytorch_lightning.metrics.classification import Accuracy,F1,Precision,Recal
 class TrainingModule(pl.LightningModule):
     def __init__(self, hparams):
         super().__init__()
-        self.model = EmoModel(AutoModelWithLMHead.from_pretrained("distilroberta-base").base_model,6)
+        self.model = EmoModel(AutoModelWithLMHead.from_pretrained("distilroberta-base").base_model,6).
         self.loss = nn.CrossEntropyLoss() ## combines LogSoftmax() and NLLLoss()
         self.hparams = hparams
+        self.model_name = 'ROBERTa'
         self.save_hyperparameters()
 
     def step(self, batch, step_name="train"):
@@ -158,7 +159,6 @@ if __name__ == '__main__':
     ## train roughly for about 10-15 minutes with GPU enabled.
             trainer = pl.Trainer(gpus=1, max_epochs=hparams.epochs, progress_bar_refresh_rate=10,
                             accumulate_grad_batches=hparams.accumulate_grad_batches)
-
             trainer.fit(module)
             trainer.save_checkpoint('/content/NLP_Emotions/model/model.ckp')
             mlflow.log_params({'batch_size':hparams.batch_size,'warmup_steps':hparams.warmup_steps,'epochs':hparams.epochs,'learning_rate':hparams.lr,'accumulate_grad_batches':hparams.accumulate_grad_batches})
@@ -178,6 +178,9 @@ if __name__ == '__main__':
                     true_y.extend(y)
                     pred_y.extend(y_pred)
             mlflow.log_metrics({'accuracy':acc(torch.tensor(pred_y),torch.tensor(true_y)).item(),'f1':f1(torch.tensor(pred_y),torch.tensor(true_y)).item(),'precision':precision(torch.tensor(pred_y),torch.tensor(true_y)).item(),'recall':recall(torch.tensor(pred_y),torch.tensor(true_y)).item()})
-            mlflow.set_tag('Commit', get_commit_url())
             mlflow.set_tag('Version','LRFinder')
-            mlflow.set_tag('Commit time',get_commit_time())
+            mlflow.set_tag('Stage','train')
+            mlflow.set_tag('Commit', get_commit_url())
+            mlflow.set_tag('Time',get_commit_time())
+            mlflow.set_tag('Model',module.model_name)
+           

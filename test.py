@@ -31,21 +31,29 @@ if __name__ == '__main__':
     mlflow.set_tracking_uri('file-plugin:/content/NLP_Emotions/mlruns')
     if get_closest_gittag() == 'v2.0':
         mlflow.set_experiment('SGD')
-        mlflow.set_tag('Stage','SGD test')
+        mlflow.set_tag('Version','SGD')
+        mlflow.set_tag('Stage','test')
         mlflow.set_tag('Commit', get_commit_url())
-        mlflow.set_tag('Commit time',get_commit_time())
+        mlflow.set_tag('Time',get_commit_time())
+        mlflow.set_tag('Model',module.model_name)
         mlflow.log_params({'batch_size':module.hparams.batch_size,'epochs':module.hparams.epochs,'learning_rate':module.hparams.lr})
     else:
         try:
             print(module.hparams.warmup_steps)
             mlflow.set_experiment('LR Finder')
-            mlflow.set_tag('Stage','LR Finder test')
+            mlflow.set_tag('Version','LR Finder')
+            mlflow.set_tag('Stage','test')
+            mlflow.set_tag('Commit', get_commit_url())
+            mlflow.set_tag('Time',get_commit_time())
+            mlflow.set_tag('Model',module.model_name)
             mlflow.log_params({'batch_size':module.hparams.batch_size,'warmup_steps':module.hparams.warmup_steps,'epochs':module.hparams.epochs,'learning_rate':module.hparams.lr,'accumulate_grad_batches':module.hparams.accumulate_grad_batches})
         except AttributeError:
             mlflow.set_experiment('SGD')
-            mlflow.set_tag('Stage','SGD test')
+            mlflow.set_tag('Version','SGD')
+            mlflow.set_tag('Stage','test')
             mlflow.set_tag('Commit', get_commit_url())
-            mlflow.set_tag('Commit time',get_commit_time())
+            mlflow.set_tag('Time',get_commit_time())
+            mlflow.set_tag('Model',module.model_name)
             mlflow.log_params({'batch_size':module.hparams.batch_size,'epochs':module.hparams.epochs,'learning_rate':module.hparams.lr})
             
 
