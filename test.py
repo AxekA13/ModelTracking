@@ -4,7 +4,7 @@ import torch
 import mlflow
 import subprocess
 from train import TrainingModule
-from git_url import get_commit_url,get_commit_time
+from git_commit import get_commit,get_commit_time
 from pytorch_lightning.metrics.classification import Accuracy,F1,Precision,Recall
 
 def get_closest_gittag():
@@ -51,7 +51,7 @@ if __name__ == '__main__':
             mlflow.set_experiment('SGD')
             mlflow.set_tag('Version','SGD')
             mlflow.set_tag('Stage','test')
-            mlflow.set_tag('Commit', get_commit()
+            mlflow.set_tag('Commit', get_commit())
             mlflow.set_tag('Time',get_commit_time())
             mlflow.set_tag('Model',module.model_name)
             mlflow.log_params({'batch_size':module.hparams.batch_size,'epochs':module.hparams.epochs,'learning_rate':module.hparams.lr})

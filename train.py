@@ -7,7 +7,7 @@ import mlflow.pytorch
 import pickle
 import os
 import yaml
-from git_url import get_commit_url,get_commit_time
+from git_commit import get_commit,get_commit_time
 from model import EmoModel
 from torch.utils.data import DataLoader
 from transformers import get_linear_schedule_with_warmup,AutoModelWithLMHead,AdamW
