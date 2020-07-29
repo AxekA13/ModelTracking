@@ -37,7 +37,7 @@ from pytorch_lightning.metrics.classification import Accuracy,F1,Precision,Recal
 class TrainingModule(pl.LightningModule):
     def __init__(self, hparams):
         super().__init__()
-        self.model = EmoModel(AutoModelWithLMHead.from_pretrained("distilroberta-base").base_model,6).
+        self.model = EmoModel(AutoModelWithLMHead.from_pretrained("distilroberta-base").base_model,6)
         self.loss = nn.CrossEntropyLoss() ## combines LogSoftmax() and NLLLoss()
         self.hparams = hparams
         self.model_name = 'ROBERTa'
