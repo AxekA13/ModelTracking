@@ -180,7 +180,7 @@ if __name__ == '__main__':
             mlflow.log_metrics({'accuracy':acc(torch.tensor(pred_y),torch.tensor(true_y)).item(),'f1':f1(torch.tensor(pred_y),torch.tensor(true_y)).item(),'precision':precision(torch.tensor(pred_y),torch.tensor(true_y)).item(),'recall':recall(torch.tensor(pred_y),torch.tensor(true_y)).item()})
             mlflow.set_tag('Version','LRFinder')
             mlflow.set_tag('Stage','train')
-            mlflow.set_tag('Commit', get_commit_url())
+            mlflow.set_tag('Commit', get_commit())
             mlflow.set_tag('Time',get_commit_time())
             mlflow.set_tag('Model',module.model_name)
            
