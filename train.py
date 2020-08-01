@@ -78,9 +78,6 @@ class TrainingModule(pl.LightningModule):
 
     def test_dataloader(self):
         return self.create_data_loader(self.hparams.test_path)
-    
-    def configure_optimizers(self):
-        optimizer = torch.optim.SGD()
                 
     def create_data_loader(self, ds_path: str, shuffle=False):
         return DataLoader(
@@ -89,43 +86,11 @@ class TrainingModule(pl.LightningModule):
                     shuffle=shuffle,
                     collate_fn=TokenizersCollateFn()
         )
-        
-    @lru_cache()
-    def total_steps(self):
-        return len(self.train_dataloader()) // self.hparams.accumulate_grad_batches * self.hparams.epochs
 
     def configure_optimizers(self):
-        ## use AdamW optimizer -- faster approach to training NNs
-        ## read: https://www.fast.ai/2018/07/02/adam-weight-decay/
-        optimizer = AdamW(self.model.parameters(), lr=self.hparams.lr)
-        lr_scheduler = get_linear_schedule_with_warmup(
-                    optimizer,
-                    num_warmup_steps=self.hparams.warmup_steps,
-                    num_training_steps=self.total_steps(),
-        )
-        return [optimizer], [{"scheduler": lr_scheduler, "interval": "step"}]
+        optimizer = torch.optim.SGD(self.model.parameters(), lr=self.hparams.lr)
+        return optimizer
 
-# Function below aims to obtain valuable information about the optimal learning rate during a pretraining run.
-# Determine boundary and increase the leanring rate linearly or exponentially.
-# More: https://github.com/davidtvs/pytorch-lr-finder
-def learningrate_finder(uper_bound,lower_bound,dataset_directory,end_learning =100,num_iterations=100):
-    hparams_tmp = Namespace(
-    train_path=dataset_directory + '/train.txt',
-    val_path=dataset_directory + '/val.txt',
-    test_path=dataset_directory + '/test.txt',
-    batch_size=16,
-    warmup_steps=100,
-    epochs=1,
-    lr= uper_bound,
-    accumulate_grad_batches=1,)
-    module = TrainingModule(hparams_tmp)
-    criterion = nn.CrossEntropyLoss()
-    optimizer = AdamW(module.parameters(), lr=lower_bound) ## lower bound LR
-    lr_finder = LRFinder(module, optimizer, criterion, device="gpu")
-    lr_finder.range_test(module.train_dataloader(), end_lr=end_learning, num_iter=num_iterations, accumulation_steps=hparams_tmp.accumulate_grad_batches)
-    lr_finder.plot()
-    #lr_finer.plot(show_lr=lr) show using learning rate
-    lr_finder.reset()
 
 if __name__ == '__main__':
     
@@ -137,10 +102,8 @@ if __name__ == '__main__':
     val_path=params['train']['val_path'],
     test_path=params['train']['test_path'],
     batch_size=params['train']['batch_size'],
-    warmup_steps=params['train']['warmup_steps'],
     epochs=params['train']['epochs'],
-    lr=float(params['train']['lr']),
-    accumulate_grad_batches=params['train']['accumulate_grad_batches'])
+    lr=float(params['train']['lr']))
 
 
     module = TrainingModule(hparams)
@@ -150,18 +113,17 @@ if __name__ == '__main__':
     torch.cuda.empty_cache()
 
     mlflow.set_tracking_uri('file-plugin:/content/NLP_Emotions/mlruns')
-    mlflow.set_experiment('LR Finder')
+    mlflow.set_experiment('SGD')
     acc = Accuracy()
     f1 = F1()
     precision = Precision()
     recall = Recall()
     with mlflow.start_run():
     ## train roughly for about 10-15 minutes with GPU enabled.
-            trainer = pl.Trainer(gpus=1, max_epochs=hparams.epochs, progress_bar_refresh_rate=10,
-                            accumulate_grad_batches=hparams.accumulate_grad_batches)
+            trainer = pl.Trainer(gpus=1, max_epochs=hparams.epochs, progress_bar_refresh_rate=10)
             trainer.fit(module)
             trainer.save_checkpoint('/content/NLP_Emotions/model/model.ckp')
-            mlflow.log_params({'batch_size':hparams.batch_size,'warmup_steps':hparams.warmup_steps,'epochs':hparams.epochs,'learning_rate':hparams.lr,'accumulate_grad_batches':hparams.accumulate_grad_batches})
+            mlflow.log_params({'batch_size':hparams.batch_size,'epochs':hparams.epochs,'learning_rate':hparams.lr})
 
     # evaluating the trained model
 
@@ -178,7 +140,7 @@ if __name__ == '__main__':
                     true_y.extend(y)
                     pred_y.extend(y_pred)
             mlflow.log_metrics({'accuracy':acc(torch.tensor(pred_y),torch.tensor(true_y)).item(),'f1':f1(torch.tensor(pred_y),torch.tensor(true_y)).item(),'precision':precision(torch.tensor(pred_y),torch.tensor(true_y)).item(),'recall':recall(torch.tensor(pred_y),torch.tensor(true_y)).item()})
-            mlflow.set_tag('Version','LRFinder')
+            mlflow.set_tag('Version','SGD')
             mlflow.set_tag('Stage','train')
             mlflow.set_tag('Commit', get_commit())
             mlflow.set_tag('Time',get_commit_time())
