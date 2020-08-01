@@ -1,0 +1,26 @@
+train:
+  cmd: python3 train.py
+  deps:
+  - path: dataset/test.txt
+    md5: b476a784c7f7dbcf4b47881f1240c1b1
+  - path: dataset/train.txt
+    md5: 501eca548aa1ef8d5dbd85662c709831
+  - path: dataset/val.txt
+    md5: 0d565de2de8459abcfa3502a28cd6a5b
+  - path: train.py
+    md5: 7ed06dcaa42e81a403e6103205f8b808
+  params:
+    params.yaml:
+      train.accumulate_grad_batches: 1
+      train.batch_size: 32
+      train.epochs: 1
+      train.lr: '1e-4'
+      train.test_path: dataset/test.txt
+      train.train_path: dataset/train.txt
+      train.val_path: dataset/val.txt
+      train.warmup_steps: 100
+  outs:
+  - path: lightning_logs
+    md5: dc8756254036d8f86dd19ade6ca72484.dir
+  - path: model/model.ckp
+    md5: e933e4f6d2ac782bb2ed6216f11488f8

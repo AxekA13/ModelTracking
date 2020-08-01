@@ -1,0 +1,20 @@
+stages:
+  train:
+    cmd: python3 train.py
+    deps:
+    - dataset/test.txt
+    - dataset/train.txt
+    - dataset/val.txt
+    - train.py
+    params:
+    - train.accumulate_grad_batches
+    - train.batch_size
+    - train.epochs
+    - train.lr
+    - train.test_path
+    - train.train_path
+    - train.val_path
+    - train.warmup_steps
+    outs:
+    - lightning_logs
+    - model/model.ckp
