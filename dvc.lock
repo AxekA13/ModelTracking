@@ -24,3 +24,11 @@ train:
     md5: dc8756254036d8f86dd19ade6ca72484.dir
   - path: model/model.ckp
     md5: e933e4f6d2ac782bb2ed6216f11488f8
+test:
+  cmd: python3 test.py
+  deps:
+  - path: model/model.ckp
+    md5: e933e4f6d2ac782bb2ed6216f11488f8
+  params:
+    params.yaml:
+      test.model_path: /content/NLP_Emotions/model/model.ckp

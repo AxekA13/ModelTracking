@@ -18,3 +18,9 @@ stages:
     outs:
     - lightning_logs
     - model/model.ckp
+  test:
+    cmd: python3 test.py
+    deps:
+    - model/model.ckp
+    params:
+    - test.model_path
