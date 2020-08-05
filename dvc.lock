@@ -8,11 +8,11 @@ train:
   - path: dataset/val.txt
     md5: 0d565de2de8459abcfa3502a28cd6a5b
   - path: train.py
-    md5: 386a630bbc6c27e95150bea045c80ffc
+    md5: dac2ed50fd161718e8751e9598c74d3c
   params:
     params.yaml:
       train.accumulate_grad_batches: 1
-      train.batch_size: 32
+      train.batch_size: 8
       train.epochs: 1
       train.lr: '1e-4'
       train.test_path: dataset/test.txt
@@ -21,9 +21,9 @@ train:
       train.warmup_steps: 100
   outs:
   - path: lightning_logs
-    md5: 8db2b2d35603d730b2957089d0fb2c44.dir
+    md5: 0d2a788a67086d249d592e1940019d30.dir
   - path: model/model.ckp
-    md5: 47b2e238ad23788131da3228c2f29a3a
+    md5: bb2b2ebe6e81656bf890ef9f354761d8
 test:
   cmd: python3 test.py
   deps:
