@@ -2,7 +2,7 @@ train:
   train_path: 'dataset/train.txt'
   val_path: 'dataset/val.txt'
   test_path: 'dataset/test.txt'
-  batch_size: 32
+  batch_size: 8
   warmup_steps: 100
   epochs: 1
   lr: 1e-4
