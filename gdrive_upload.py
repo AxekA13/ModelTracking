@@ -19,7 +19,7 @@ def createRemoteFolder(self, folderName, parentID = None):
 
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
-SERVICE_ACCOUNT_FILE = '/home/axeka/VSCodeProjects/NLP_Emotions/NLP_Emotions/gdrive_secrets.json'
+SERVICE_ACCOUNT_FILE = 'YOUR SECRETS FILE'
 
 credentials = service_account.Credentials.from_service_account_file(
         SERVICE_ACCOUNT_FILE, scopes=SCOPES)
