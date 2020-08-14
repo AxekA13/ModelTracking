@@ -44,14 +44,13 @@ class GitRunContext(RunContextProvider):
     def _source_version(self):
         if "source_version" not in self._cache:
             self._cache["source_version"] = _get_source_version()
-        remote_url = subprocess.check_output("git remote get-url origin",shell=True)
-
-        return str(remote_url).split('.git')[0][2:] + '/tree/' + self._cache["source_version"]
+        return self._cache["source_version"]
 
     def in_context(self):
         return self._source_version is not None
 
     def tags(self):
+        remote_url = subprocess.check_output("git remote get-url origin",shell=True)
         return {
-            MLFLOW_GIT_COMMIT: self._source_version
+            MLFLOW_GIT_COMMIT: str(remote_url).split('.git')[0][2:] + '/tree/' + self._source_version
         }
