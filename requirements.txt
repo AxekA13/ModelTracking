@@ -7,7 +7,7 @@ pandas==1.0.4
 argparse==1.1
 scikit-learn==0.23.1
 numpy==1.18.5
-mlflow==1.9.1
+mlflow==2.2.1
 torch_lr_finder==0.2.0
 google-api-python-client
 PyDrive
